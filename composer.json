@@ -2,6 +2,9 @@
     "name": "lx/fna",
     "description": "Fna - Functions with Named Arguments",
     "license": "MIT",
+    "homepage": "https://boolshit.de",
+    "keywords": ["callback", "callable", "wrapper"],
+    "type": "library",
     "authors": [
         {
             "name": "Alexander Wühr",
