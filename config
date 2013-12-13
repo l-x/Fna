@@ -1,0 +1,14 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = git@github.com:l-x/Fna.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[user]
+	name = Alexander Wühr
+	email = lx@boolshit.de
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master

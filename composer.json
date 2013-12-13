@@ -1,0 +1,19 @@
+{
+    "name": "lx/fna",
+    "description": "Fna - Functions with Named Arguments",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Wühr",
+            "email": "lx@boolshit.de"
+        }
+    ],
+
+    "autoload": {
+        "classmap": ["src/"]
+    },
+
+    "require": {
+        "php" : ">=5.3.0"
+    }
+}
