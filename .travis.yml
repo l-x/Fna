@@ -5,9 +5,13 @@ php:
 - 5.5
 - 5.6
 - hhvm
-
+addons:
+  code_climate:
+    repo_token:
+      secure: "UpSNghPNnxkjQUZk7kUDZbNJZ8Akt/mZgcUvbjKNFynSVcdRXBN1UAgn4uNS6IWwaNEJMQUhxb67tPOkUUgdAkJvGQk5kXVniLFoOpWmEscVl1U+9nSj7ZPKrbG52WyyPwbGNc/6ymGxKV6mp/cc2N2RP2cCDamgCWnzHkL4hAs="
 before_script:
 - make travis-init
 script:
 - make travis-run
-
+after_success:
+- make travis-report
