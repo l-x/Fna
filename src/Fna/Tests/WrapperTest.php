@@ -27,10 +27,6 @@ function Foo($a, $b, $c) {
  */
 class WrapperTest extends \PHPUnit_Framework_TestCase {
 
-	public function setUp() {
-
-	}
-
 	/**
 	 * @return array
 	 */
