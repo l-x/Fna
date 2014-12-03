@@ -73,8 +73,6 @@ class WrapperTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider invalidCallbackProvider
-	 *
 	 * @expectedException \Fna\Exception\InvalidParameterException
 	 * @expectedExceptionMessage Unable to handle mixed arrays
 	 */
