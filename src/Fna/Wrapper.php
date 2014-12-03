@@ -2,7 +2,7 @@
 /**
  * Fna - Functions with named arguments
  *
- * Copyright (c) 2013-2014, Alexander Wühr <lx@boolshit.de>.
+ * Copyright (c) 2013-2014, Alexander Wühr <l-x@mailbox.org>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,21 +35,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Fna
- * @author      Alexander Wühr <lx@boolshit.de>
- * @copyright   2013-2014 Alexander Wühr <lx@boolshit.de>
+ * @author      Alexander Wühr <l-x@mailbox.org>
+ * @copyright   2013-2014 Alexander Wühr <l-x@mailbox.org>
  * @license     http://opensource.org/licenses/MIT  The MIT License (MIT)
  * @link        https://github.com/l-x/Fna
  */
 
 
-namespace Lx\Fna;
+namespace Fna;
+
+use Fna\Exception\InvalidCallbackException;
+use Fna\Exception\InvalidParameterException;
 
 /**
  * Class Wrapper
  *
- * @package     Lx\Fna
- * @author      Alexander Wühr <lx@boolshit.de>
- * @copyright   2013-2014 Alexander Wühr <lx@boolshit.de>
+ * @package     Fna
+ * @author      Alexander Wühr <l-x@mailbox.org>
+ * @copyright   2013-2014 Alexander Wühr <l-x@mailbox.org>
  * @license     http://opensource.org/licenses/MIT  The MIT License (MIT)
  * @link        https://github.com/l-x/Fna
  */
@@ -65,6 +68,7 @@ class Wrapper {
 	 * @var callable
 	 */
 	protected $callback;
+
 
 	/**
 	 * Member containing the \ReflectionParameter instance of the registered callback
@@ -89,9 +93,8 @@ class Wrapper {
 	 *
 	 * @return int
 	 */
-	public function getArrayType(array $array) {
+	protected function getArrayType(array $array) {
 		$indices = count(array_filter(array_keys($array), 'is_string'));
-		$count = count($array);
 
 		if ($indices == 0) {
 			$type = self::ARRAY_TYPE_LIST;
@@ -110,7 +113,7 @@ class Wrapper {
 	 * @param callable $callback
 	 *
 	 * @return \ReflectionFunction|\ReflectionMethod
-	 * @throws \InvalidArgumentException
+	 * @throws InvalidCallbackException
 	 */
 	protected function getCallbackReflection($callback) {
 		if (is_string($callback) && strpos($callback, '::') !== false) {
@@ -125,10 +128,12 @@ class Wrapper {
 			case is_string($callback):
 				$reflection_method = new \ReflectionFunction($callback);
 				break;
+		// @codeCoverageIgnoreStart
 			default:
-				throw new \InvalidArgumentException('Invalid callback');
-		}
+				throw new \LogicException('Found something callable that we can\'t reflect');
 
+		}
+		// @codeCoverageIgnoreEnd
 		return $reflection_method;
 	}
 
@@ -138,11 +143,11 @@ class Wrapper {
 	 * @param callable $callback
 	 *
 	 * @return $this
-	 * @throws \InvalidArgumentException
+	 * @throws InvalidCallbackException
 	 */
 	protected function setCallback($callback) {
 		if (!is_callable($callback)) {
-			throw new \InvalidArgumentException('Invalid callback');
+			throw new InvalidCallbackException('Invalid callback');
 		}
 
 		$this->reflection_parameter =  $this
@@ -161,7 +166,7 @@ class Wrapper {
 	 * @param array $arguments
 	 *
 	 * @return array
-	 * @throws \InvalidArgumentException
+	 * @throws InvalidParameterException
 	 */
 	protected function prepareArguments($reflection_parameter, $arguments) {
 		$array_type = $this->getArrayType($arguments);
@@ -178,13 +183,13 @@ class Wrapper {
 				} else if ($parameter->isDefaultValueAvailable()) {
 					$value = $parameter->getDefaultValue();
 				} else {
-					throw new \InvalidArgumentException("Missing parameter '$name' on position {$parameter->getPosition()}");
+					throw new InvalidParameterException("Missing parameter '$name' on position {$parameter->getPosition()}");
 				}
 
 				$prepared[] = $value;
 			}
 		} else {
-			throw new \InvalidArgumentException('Unable to handle mixed arrays');
+			throw new InvalidParameterException('Unable to handle mixed arrays');
 		}
 
 		return $prepared;
@@ -200,10 +205,7 @@ class Wrapper {
 	public function __invoke(array $arguments = array()) {
 		return call_user_func_array(
 			$this->callback,
-			$this->prepareArguments(
-			     $this->reflection_parameter,
-				     $arguments
-			)
+			$this->prepareArguments($this->reflection_parameter, $arguments)
 		);
 	}
 }

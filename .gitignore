@@ -1,5 +1,9 @@
-/.idea/
-/atlassian-ide-plugin.xml
-/build/
-
+dev/
+.idea/
 /vendor/
+build/
+phpunit.xml
+phpdoc.xml
+composer.phar
+phpDocumentor.phar
+codeclimate.json
