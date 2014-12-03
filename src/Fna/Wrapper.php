@@ -160,6 +160,37 @@ class Wrapper {
 	}
 
 	/**
+	 * @param \ReflectionParameter[] $reflection_parameters
+	 */
+	protected function prepareDefaults($reflection_parameters) {
+		$parameters = array();
+		foreach ($reflection_parameters as $parameter) {
+			$name = $parameter->getName();
+			$parameters[$name] = null;
+			if ($parameter->isDefaultValueAvailable()) {
+				$parameters[$name] = $parameter->getDefaultValue();
+			}
+		}
+
+		return $parameters;
+	}
+
+	protected function merge($defaults, $arguments) {
+		$indices = array_keys($defaults);
+		$index = 0;
+		foreach ($arguments as $key => $value) {
+			if (is_integer($key)) {
+
+				$key = $indices[$index];
+			}
+			$defaults[$key] = $value;
+			$index++;
+		}
+
+		return $defaults;
+	}
+
+	/**
 	 * Prepares the argument array for use with call_user_func_array
 	 *
 	 * @param \ReflectionParameter[] $reflection_parameter
@@ -169,30 +200,9 @@ class Wrapper {
 	 * @throws InvalidParameterException
 	 */
 	protected function prepareArguments($reflection_parameter, $arguments) {
-		$array_type = $this->getArrayType($arguments);
-		$prepared = array();
-
-		if ($array_type == self::ARRAY_TYPE_LIST) {
-			$prepared = $arguments;
-		} elseif ($array_type == self::ARRAY_TYPE_DICT) {
-			foreach ($reflection_parameter as $parameter) {
-				$name = $parameter->getName();
-
-				if (isset($arguments[$name])) {
-					$value = $arguments[$name];
-				} else if ($parameter->isDefaultValueAvailable()) {
-					$value = $parameter->getDefaultValue();
-				} else {
-					throw new InvalidParameterException("Missing parameter '$name' on position {$parameter->getPosition()}");
-				}
-
-				$prepared[] = $value;
-			}
-		} else {
-			throw new InvalidParameterException('Unable to handle mixed arrays');
-		}
-
-		return $prepared;
+		$defaults = $this->prepareDefaults($reflection_parameter);
+		$values = $this->merge($defaults, $arguments);
+		return array_values($values);
 	}
 
 	/**

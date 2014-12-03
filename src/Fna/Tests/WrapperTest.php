@@ -73,17 +73,17 @@ class WrapperTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @dataProvider invalidCallbackProvider
-	 *
 	 * @expectedException \Fna\Exception\InvalidParameterException
 	 * @expectedExceptionMessage Unable to handle mixed arrays
 	 */
-	public function testFailsForMixedArray() {
+	public function testSucceedsForMixedArray() {
 		$mock = $this->getMock('Fna\CallbackCollection');
-		$mock->expects($this->never())->method('__invoke');
+		$mock->expects($this->once())
+			->method('__invoke')
+			->with('a', 'b', 'c');
 
 		$wrapper = new Wrapper($mock);
-		$wrapper->__invoke(array('a' => 'a', 'b', 'c'));
+		$wrapper->__invoke(array('b', 'a' => 'a', 'c'));
 	}
 
 	public function testSucceedsForParamList() {
