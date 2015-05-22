@@ -120,13 +120,14 @@ class Wrapper {
 			$callback = explode('::', $callback, 2);
 		}
 		switch (true) {
+			case is_string($callback) && function_exists($callback):
+			case $callback instanceof \Closure:
+				$reflection_method = new \ReflectionFunction($callback);
+				break;
 			case is_object($callback) && method_exists($callback, '__invoke'):
 				$callback = array($callback, '__invoke');
 			case is_array($callback):
 				$reflection_method = new \ReflectionMethod($callback[0], $callback[1]);
-				break;
-			case is_string($callback):
-				$reflection_method = new \ReflectionFunction($callback);
 				break;
 		// @codeCoverageIgnoreStart
 			default:

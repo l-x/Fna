@@ -20,6 +20,11 @@ function Foo($a, $b, $c) {
 
 }
 
+global $closure;
+$closure = function ($a, $b, $c = 'with default value') {
+
+};
+
 /**
  * Class WrapperTest
  *
@@ -31,13 +36,14 @@ class WrapperTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function invalidCallbackProvider() {
+		global $closure;
 		return array(
 			array(true),
 		        array(null),
 		        array(array('fna')),
 		        array('nonexistingfunction'),
 		        array(array(new \stdClass, 'nonexistingmethod')),
-		        array('\stdClass::nonexistingmethod'),
+		        array('\stdClass::nonexistingmethod')
 		);
 	}
 
@@ -70,6 +76,11 @@ class WrapperTest extends \PHPUnit_Framework_TestCase {
 
 	public function testConstructorSuccedsForInvokableObject() {
 		$this->assertInstanceOf('\Fna\Wrapper', new Wrapper(new CallbackCollection()));
+	}
+
+	public function testConstructorSuccedsForClosure() {
+		global $closure;
+		$this->assertInstanceOf('\Fna\Wrapper', new Wrapper($closure));
 	}
 
 	/**
@@ -124,5 +135,17 @@ class WrapperTest extends \PHPUnit_Framework_TestCase {
 
 		$wrapper = new Wrapper($mock);
 		$wrapper->__invoke(array('b' => 'b'));
+	}
+
+	public function closureReflection() {
+		$closure = function ($a, $b = 1) {
+			return $a - $b;
+		};
+
+		$wrapper = new Wrapper($closure);
+		$this->assertEquals(1, $wrapper->__invoke(array(2, 1)));
+		$this->assertEquals(1, $wrapper->__invoke(array(2)));
+		$this->assertEquals(1, $wrapper->__invoke(array('a' => 2)));
+		$this->assertEquals(-1, $wrapper->__invoke(array('b' => 3, 'a' => 2)));
 	}
 }
